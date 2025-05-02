@@ -1,0 +1,36 @@
+// Pin definitions
+const int pirPin = 2;        // PIR sensor output pin
+const int redLed = 3;        // Red LED pin
+const int greenLed = 4;      // Green LED pin
+const int buzzer = 5;        // Buzzer pin
+
+void setup() {
+  pinMode(pirPin, INPUT);
+  pinMode(redLed, OUTPUT);
+  pinMode(greenLed, OUTPUT);
+  pinMode(buzzer, OUTPUT);
+
+  digitalWrite(redLed, LOW);
+  digitalWrite(greenLed, HIGH); // Start with green LED on
+  digitalWrite(buzzer, LOW);
+
+  Serial.begin(9600);
+}
+
+void loop() {
+  int motionDetected = digitalRead(pirPin);
+
+  if (motionDetected == HIGH) {
+    Serial.println("Motion detected!");
+    digitalWrite(redLed, HIGH);
+    digitalWrite(greenLed, LOW);
+    digitalWrite(buzzer, HIGH);
+  } else {
+    Serial.println("No motion.");
+    digitalWrite(redLed, LOW);
+    digitalWrite(greenLed, HIGH);
+    digitalWrite(buzzer, LOW);
+  }
+
+  delay(200); // Small delay to stabilize readings
+}
