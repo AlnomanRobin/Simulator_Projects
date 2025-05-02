@@ -1,0 +1,53 @@
+.include "m328pdef.inc"
+
+; === Define bit positions for the ports ===
+.equ PIR     = 2   ; PD2
+.equ REDLED  = 3   ; PD3
+.equ GREENLED = 4  ; PD4
+.equ BUZZER  = 5   ; PD5
+
+; === Initialize ===
+rjmp RESET
+
+RESET:
+    ldi r16, 0b00111000   ; Set PD3, PD4, PD5 as output (red, green, buzzer)
+    out DDRD, r16
+
+    ldi r16, 0b00010000   ; Set green LED HIGH
+    out PORTD, r16
+
+    ; Serial init skipped here for simplicity
+
+MAIN_LOOP:
+    in r17, PIND          ; Read PORTD
+    sbrs r17, PIR         ; Skip next if PIR bit is SET (motion detected)
+    rjmp NO_MOTION
+
+MOTION_DETECTED:
+    ; Red LED ON, Green LED OFF, Buzzer ON
+    ldi r18, (1<<REDLED) | (1<<BUZZER)
+    out PORTD, r18
+    rjmp DELAY
+
+NO_MOTION:
+    ; Red LED OFF, Green LED ON, Buzzer OFF
+    ldi r18, (1<<GREENLED)
+    out PORTD, r18
+
+DELAY:
+    rcall delay_200ms
+    rjmp MAIN_LOOP
+
+; === Delay ~200ms ===
+; This is approximate and may need tuning
+delay_200ms:
+    ldi r20, 200
+outer_loop:
+    ldi r21, 255
+inner_loop:
+    nop
+    dec r21
+    brne inner_loop
+    dec r20
+    brne outer_loop
+    ret
